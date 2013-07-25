@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body style="font-family: Helvetica;font-size: 9pt;">
+        
+        <h:outputStylesheet>
+
+            .rf-msg-err, .rf-msgs-err, .rf-msg-ftl, .rf-msgs-ftl, .rf-msg-inf, 
+            .rf-msgs-inf, .rf-msg-wrn, .rf-msgs-wrn, .rf-msg-ok, .rf-msgs-ok { 
+            margin-left: 0px;
+            padding-left: 0px;
+            background-image:none;}
+
+            .rf-msg-err, .rf-msgs-err{ background-image:none; }
+            
+            .table-header{
+                font-weight: normal; text-align: left;
+            }
+            .table-column{
+                width: 200px;
+            }
+            tr.table-row:hover {
+                background-color: #DCDCDC;
+            }
+
+        </h:outputStylesheet>
+        
+        <h:form id="addForm">  
+
+            <table style="position: relative; top: 100px;">
+                <tr>
+                    <td width="35%"></td>
+                    <td width="600px">
+                               
+                       <h:outputText style="position: relative; left: 3px;" value="Add a new Trip, Alex:" /><br/><br/>
+
+                            <h:panelGrid columns="4" cellpadding="3" cellspacing="0" id="panelGrid">
+
+                                <h:outputText value="Hin:"></h:outputText>
+                                <h:outputText value="Mittag:"></h:outputText>
+                                <h:outputText value="Zurück:"></h:outputText>
+                                <h:outputText value="&nbsp;"></h:outputText>
+
+                                <h:selectOneMenu id="wayToSelect" value="#{standard.oneDay.wayTo}" style="font-family: Verdana;font-size: 9pt;" >
+                                     <f:selectItems value="#{dataProducer.moveTypes}" var="moveType" itemLabel="#{moveType.name}" itemValue="#{moveType.id}"/>
+                                     <f:converter converterId="net.appone.MoveTypeConverter" />
+                                     <a4j:ajax render="panelGrid" execute="@this" event="change" />
+                                </h:selectOneMenu>
+                                <h:selectOneMenu id="middaySelect" value="#{standard.oneDay.midday}" style="font-family: Verdana;font-size: 9pt;">
+                                    <f:selectItems value="#{dataProducer.moveTypes}" var="moveType" itemLabel="#{moveType.name}" itemValue="#{moveType.id}"/>
+                                    <f:converter converterId="net.appone.MoveTypeConverter" />
+                                    <a4j:ajax render="panelGrid" execute="@this" event="change" />
+                                </h:selectOneMenu>
+                                <h:selectOneMenu id="wayBackSelect" value="#{standard.oneDay.wayBack}" style="font-family: Verdana;font-size: 9pt;">
+                                     <f:selectItems value="#{dataProducer.moveTypes}" var="moveType" itemLabel="#{moveType.name}" itemValue="#{moveType.id}"/>
+                                     <f:converter converterId="net.appone.MoveTypeConverter" />
+                                     <a4j:ajax render="panelGrid" execute="@this" event="change" />
+                                </h:selectOneMenu>
+                                <h:outputText value="&nbsp;"></h:outputText>
+
+                                <h:outputText id="wayToMinutes" value="#{standard.oneDay.wayTo.minutesFormatted}"></h:outputText>
+                                <h:outputText id="middayMinutes" value="#{standard.oneDay.midday.minutesFormatted}"></h:outputText>
+                                <h:outputText id="wayBackMinutes" value="#{standard.oneDay.wayBack.minutesFormatted}"></h:outputText>
+                                <h:outputText id="allMinutes" value="#{standard.oneDay.minutesSumFormatted}"></h:outputText>
+
+                                <a4j:commandButton id="addButton" value="Add" action="#{standard.add}" render="allDays,panelGrid"></a4j:commandButton>  
+                            </h:panelGrid>
+
+                            <br/><br/><br/>
+                            <h:panelGrid columns="1" id="tableWrapper">
+                                <h:dataTable cellpadding="3" cellspacing="0" id="allDays" value="#{standard.daysModel}" var="day" headerClass="table-header" columnClasses="table-column,table-column,table-column,table-column,table-column" rowClasses="table-row">
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Hin:" />
+                                    </f:facet>
+                                    <h:outputText style="#{day.done == true ? 'color:blue;text-decoration:line-through;' : ''}" value="#{day.wayTo.name}" />
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Mittag:" />
+                                    </f:facet>
+                                    <h:outputText style="#{day.done == true ? 'color:blue;text-decoration:line-through;' : ''}" value="#{day.midday.name}" />
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Zurück:" />
+                                    </f:facet>
+                                    <h:outputText style="#{day.done == true ? 'color:blue;text-decoration:line-through;' : ''}" value="#{day.wayBack.name}" />
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Dauer:" />
+                                    </f:facet>
+                                    <h:outputText style="#{day.done == true ? 'color:blue;text-decoration:line-through;' : ''}" value="#{day.minutesSumFormatted}" />
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Geschafft:" />
+                                    </f:facet>
+                                    <h:selectBooleanCheckbox value="#{day.done}" valueChangeListener="#{standard.madeIt}" >
+                                        <a4j:ajax execute="@this" event="change" oncomplete="renderTable();return false;"/>                  
+                                    </h:selectBooleanCheckbox>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Löschen:" />
+                                    </f:facet>
+                                    <a4j:commandLink id="removeLink" action="#{standard.deleteDay(day)}" value="x" render="tableWrapper" execute="removeLink"></a4j:commandLink>
+                                </h:column>
+                            </h:dataTable>
+                        </h:panelGrid>
+                    </td>
+                    <td width="35%"></td>
+                </tr>  
+            </table> 
+            
+                   
+        <a4j:jsFunction name="renderTable" render="allDays"></a4j:jsFunction>
+        
+        <rich:notifyMessages stayTime="2000" nonblocking="true" />
+            
+        </h:form>   
+    </h:body>
+</html>
+
